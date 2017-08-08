@@ -43,12 +43,12 @@ class Pong(val canvas: HTMLCanvasElement, val width: Double = 800.0, val height:
 
         if (ball.position.y - ball.radius < 0) {
             ball.direction = Vector2(ball.direction.x, -ball.direction.y)
-            ball.position = Vector2(ball.position.x, -ball.position.y + ball.radius + 1.0)
+            ball.position = Vector2(ball.position.x, ball.radius + 1.0)
         }
 
         if (ball.position.y + ball.radius > height) {
             ball.direction = Vector2(ball.direction.x, -ball.direction.y)
-            ball.position = Vector2(ball.position.x, height - (ball.position.y - height) - ball.radius - 1.0)
+            ball.position = Vector2(ball.position.x, height -ball.radius - 1.0)
         }
 
         // Players
@@ -161,6 +161,7 @@ class Pong(val canvas: HTMLCanvasElement, val width: Double = 800.0, val height:
 
     init {
         updateSize()
+        ball.resetPosition()
         window.addEventListener("resize", {
             updateSize()
         })

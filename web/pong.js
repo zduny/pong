@@ -18,7 +18,7 @@ var Pong = function (_, Kotlin) {
     get: function () {
       var d = this.game.ball.position.y - this.player.position.y;
       var m = clamp(Math.abs(d) / this.game.maxPlayerSpeed * d, -1.0, 1.0);
-      return m;
+      return m * 0.8;
     }
   });
   AIController.$metadata$ = {
@@ -179,7 +179,7 @@ var Pong = function (_, Kotlin) {
     if (paddleHeight === void 0)
       paddleHeight = 60.0;
     if (paddleWidth === void 0)
-      paddleWidth = 10.0;
+      paddleWidth = 11.0;
     this.position = position;
     this.score = score;
     this.paddleHeight = paddleHeight;
@@ -218,6 +218,7 @@ var Pong = function (_, Kotlin) {
     this.leftController = new EmptyController(this, this.left);
     this.rightController = new EmptyController(this, this.right);
     this.updateSize();
+    this.resetPosition_0(this.ball);
     window.addEventListener('resize', Pong_init$lambda(this));
   }
   Pong.prototype.randomVector_0 = function () {
@@ -240,11 +241,11 @@ var Pong = function (_, Kotlin) {
     this.ball.update_14dthe$(dt);
     if (this.ball.position.y - this.ball.radius < 0) {
       this.ball.direction = new Vector2(this.ball.direction.x, -this.ball.direction.y);
-      this.ball.position = new Vector2(this.ball.position.x, -this.ball.position.y + this.ball.radius + 1.0);
+      this.ball.position = new Vector2(this.ball.position.x, this.ball.radius + 1.0);
     }
     if (this.ball.position.y + this.ball.radius > this.height) {
       this.ball.direction = new Vector2(this.ball.direction.x, -this.ball.direction.y);
-      this.ball.position = new Vector2(this.ball.position.x, this.height - (this.ball.position.y - this.height) - this.ball.radius - 1.0);
+      this.ball.position = new Vector2(this.ball.position.x, this.height - this.ball.radius - 1.0);
     }
     tmp$ = this.left;
     tmp$.position = tmp$.position.plus_hdskun$(Vector2$Companion_getInstance().up.times_14dthe$(this.leftController.direction).times_14dthe$(this.maxPlayerSpeed).times_14dthe$(dt));
