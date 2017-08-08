@@ -1,4 +1,4 @@
-package pl.dzduniak.pong
+package pl.dzduniak.pong.math
 
 import kotlin.js.Math
 
@@ -10,6 +10,7 @@ fun Double.floor() = Math.floor(this)
 fun Double.round() = Math.round(this)
 fun Int.modulo(m: Int) = ((this % m) + m) % m
 fun Double.modulo(m: Double) = ((this % m) + m) % m
+fun Double.sign() = if (this > 0) 1.0 else if (this < 0) -1.0 else 0.0
 
 fun Int.nextHighestPowerOf2(): Int {
     var v = this

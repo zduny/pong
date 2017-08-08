@@ -1,5 +1,6 @@
 package pl.dzduniak.pong;
 
+import pl.dzduniak.pong.math.clamp
 import kotlin.browser.window
 
 abstract class GameLoop() {

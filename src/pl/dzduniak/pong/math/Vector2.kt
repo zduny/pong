@@ -1,4 +1,4 @@
-package pl.dzduniak.pong
+package pl.dzduniak.pong.math
 
 import kotlin.js.Math
 
