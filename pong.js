@@ -3,9 +3,86 @@ if (typeof kotlin === 'undefined') {
 }
 var Pong = function (_, Kotlin) {
   'use strict';
-  var Pair = Kotlin.kotlin.Pair;
-  main$ObjectLiteral.prototype = Object.create(GameLoop.prototype);
-  main$ObjectLiteral.prototype.constructor = main$ObjectLiteral;
+  AIController.prototype = Object.create(Controller.prototype);
+  AIController.prototype.constructor = AIController;
+  EmptyController.prototype = Object.create(Controller.prototype);
+  EmptyController.prototype.constructor = EmptyController;
+  KeyboardController.prototype = Object.create(Controller.prototype);
+  KeyboardController.prototype.constructor = KeyboardController;
+  Pong.prototype = Object.create(GameLoop.prototype);
+  Pong.prototype.constructor = Pong;
+  function AIController(game, player) {
+    Controller.call(this, game, player);
+  }
+  Object.defineProperty(AIController.prototype, 'direction', {
+    get: function () {
+      var d = this.game.ball.position.y - this.player.position.y;
+      var m = clamp(Math.abs(d) / this.game.maxPlayerSpeed * d, -1.0, 1.0);
+      return m;
+    }
+  });
+  AIController.$metadata$ = {
+    kind: Kotlin.Kind.CLASS,
+    simpleName: 'AIController',
+    interfaces: [Controller]
+  };
+  function Ball(position, direction, radius, initialSpeed, speedUpFactor) {
+    if (direction === void 0)
+      direction = Vector2$Companion_getInstance().left;
+    if (radius === void 0)
+      radius = 8.0;
+    if (initialSpeed === void 0)
+      initialSpeed = 400.0;
+    if (speedUpFactor === void 0)
+      speedUpFactor = 1.05;
+    this.position = position;
+    this.direction = direction;
+    this.radius = radius;
+    this.initialSpeed = initialSpeed;
+    this.speedUpFactor = speedUpFactor;
+    this.speed = this.initialSpeed;
+  }
+  Object.defineProperty(Ball.prototype, 'bounds', {
+    get: function () {
+      return Rectangle2_init(this.position.minus_hdskun$(new Vector2(this.radius, this.radius)), 2 * this.radius, 2 * this.radius);
+    }
+  });
+  Ball.prototype.update_14dthe$ = function (dt) {
+    this.position = this.position.plus_hdskun$(this.direction.times_14dthe$(this.speed).times_14dthe$(dt));
+  };
+  Ball.prototype.speedUp = function () {
+    this.speed *= this.speedUpFactor;
+  };
+  Ball.prototype.resetSpeed = function () {
+    this.speed = this.initialSpeed;
+  };
+  Ball.$metadata$ = {
+    kind: Kotlin.Kind.CLASS,
+    simpleName: 'Ball',
+    interfaces: []
+  };
+  function Controller(game, player) {
+    this.game = game;
+    this.player = player;
+  }
+  Controller.$metadata$ = {
+    kind: Kotlin.Kind.CLASS,
+    simpleName: 'Controller',
+    interfaces: []
+  };
+  function EmptyController(game, player) {
+    Controller.call(this, game, player);
+  }
+  Object.defineProperty(EmptyController.prototype, 'direction', {
+    get: function () {
+      return 0.0;
+    }
+  });
+  EmptyController.$metadata$ = {
+    kind: Kotlin.Kind.CLASS,
+    simpleName: 'EmptyController',
+    interfaces: [Controller]
+  };
   function GameLoop() {
     this.paused_h96hr6$_0 = true;
     this.previousTime_h96hr6$_0 = 0.0;
@@ -44,232 +121,227 @@ var Pong = function (_, Kotlin) {
     simpleName: 'GameLoop',
     interfaces: []
   };
-  function main$updateSize(closure$canvas, closure$width, closure$height, closure$c) {
-    return function () {
-      var dpi = window.devicePixelRatio;
-      closure$canvas.width = floor(closure$canvas.clientWidth * dpi);
-      closure$canvas.height = floor(closure$canvas.clientHeight * dpi);
-      var scaleX = closure$canvas.width / closure$width;
-      var scaleY = closure$canvas.height / closure$height;
-      if (scaleX < scaleY)
-        closure$c.setTransform(scaleX, 0.0, 0.0, scaleX, 0.0, floor((closure$canvas.height - closure$height * scaleX) / 2));
-      else
-        closure$c.setTransform(scaleY, 0.0, 0.0, scaleY, floor((closure$canvas.width - closure$width * scaleY) / 2), 0.0);
+  function KeyboardController(game, player) {
+    Controller.call(this, game, player);
+    this.downPressed_0 = false;
+    this.upPressed_0 = false;
+    window.addEventListener('keydown', KeyboardController_init$lambda(this));
+    window.addEventListener('keyup', KeyboardController_init$lambda_0(this));
+  }
+  Object.defineProperty(KeyboardController.prototype, 'direction', {
+    get: function () {
+      var dir = 0.0;
+      if (this.downPressed_0)
+        dir += 1.0;
+      if (this.upPressed_0)
+        dir -= 1.0;
+      return dir;
+    }
+  });
+  function KeyboardController_init$lambda(this$KeyboardController) {
+    return function (it) {
+      var tmp$, tmp$_0;
+      Kotlin.isType(tmp$ = it, KeyboardEvent) ? tmp$ : Kotlin.throwCCE();
+      tmp$_0 = it.key;
+      if (Kotlin.equals(tmp$_0, 'ArrowDown'))
+        this$KeyboardController.downPressed_0 = true;
+      else if (Kotlin.equals(tmp$_0, 'ArrowUp'))
+        this$KeyboardController.upPressed_0 = true;
     };
   }
-  function main$ObjectLiteral(closure$c, closure$canvas, closure$width, closure$height, closure$scoreLeft, closure$scoreRight, closure$paddleOffset, closure$positionLeft, closure$paddleHalfHeight, closure$paddleWidth, closure$paddleHeight, closure$positionRight, closure$ballPosition, closure$ballRadius, closure$maxSpeed, closure$downPressed, closure$upPressed, closure$speedLeft, closure$speedRight, closure$ballDirection, closure$ballSpeed, closure$ballInitialSpeed, closure$leftTurn, closure$speedUpFactor) {
-    this.closure$c = closure$c;
-    this.closure$canvas = closure$canvas;
-    this.closure$width = closure$width;
-    this.closure$height = closure$height;
-    this.closure$scoreLeft = closure$scoreLeft;
-    this.closure$scoreRight = closure$scoreRight;
-    this.closure$paddleOffset = closure$paddleOffset;
-    this.closure$positionLeft = closure$positionLeft;
-    this.closure$paddleHalfHeight = closure$paddleHalfHeight;
-    this.closure$paddleWidth = closure$paddleWidth;
-    this.closure$paddleHeight = closure$paddleHeight;
-    this.closure$positionRight = closure$positionRight;
-    this.closure$ballPosition = closure$ballPosition;
-    this.closure$ballRadius = closure$ballRadius;
-    this.closure$maxSpeed = closure$maxSpeed;
-    this.closure$downPressed = closure$downPressed;
-    this.closure$upPressed = closure$upPressed;
-    this.closure$speedLeft = closure$speedLeft;
-    this.closure$speedRight = closure$speedRight;
-    this.closure$ballDirection = closure$ballDirection;
-    this.closure$ballSpeed = closure$ballSpeed;
-    this.closure$ballInitialSpeed = closure$ballInitialSpeed;
-    this.closure$leftTurn = closure$leftTurn;
-    this.closure$speedUpFactor = closure$speedUpFactor;
-    GameLoop.call(this);
+  function KeyboardController_init$lambda_0(this$KeyboardController) {
+    return function (it) {
+      var tmp$, tmp$_0;
+      Kotlin.isType(tmp$ = it, KeyboardEvent) ? tmp$ : Kotlin.throwCCE();
+      tmp$_0 = it.key;
+      if (Kotlin.equals(tmp$_0, 'ArrowDown'))
+        this$KeyboardController.downPressed_0 = false;
+      else if (Kotlin.equals(tmp$_0, 'ArrowUp'))
+        this$KeyboardController.upPressed_0 = false;
+    };
   }
-  main$ObjectLiteral.prototype.render = function () {
-    this.closure$c.save();
-    this.closure$c.setTransform(1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
-    this.closure$c.clearRect(0.0, 0.0, this.closure$canvas.width, this.closure$canvas.height);
-    this.closure$c.restore();
-    this.closure$c.strokeStyle = 'white';
-    this.closure$c.lineWidth = 5.0;
-    this.closure$c.setLineDash([]);
-    this.closure$c.beginPath();
-    this.closure$c.moveTo(0.0, -2.5);
-    this.closure$c.lineTo(this.closure$width, -2.5);
-    this.closure$c.stroke();
-    this.closure$c.beginPath();
-    this.closure$c.moveTo(0.0, this.closure$height + 2.5);
-    this.closure$c.lineTo(this.closure$width, this.closure$height + 2.5);
-    this.closure$c.stroke();
-    var middleX = this.closure$width / 2;
-    var x = floor(middleX) + 0.5;
-    this.closure$c.lineWidth = 4.0;
-    this.closure$c.beginPath();
-    this.closure$c.setLineDash([5.0, 10.0]);
-    this.closure$c.lineDashOffset = 10.0;
-    this.closure$c.moveTo(x, 0.0);
-    this.closure$c.lineTo(x, this.closure$height);
-    this.closure$c.stroke();
-    this.closure$c.fillStyle = 'white';
-    this.closure$c.font = '90px Square';
-    this.closure$c.textAlign = 'right';
-    this.closure$c.textBaseline = 'top';
-    this.closure$c.fillText(this.closure$scoreLeft.v.toString(), middleX - 40.0, 20.0 - 7.0);
-    this.closure$c.textAlign = 'left';
-    this.closure$c.fillText(this.closure$scoreRight.v.toString(), middleX + 40.0 - 0.5, 20.0 - 7.0);
-    this.closure$c.fillStyle = 'white';
-    this.closure$c.beginPath();
-    this.closure$c.rect(this.closure$paddleOffset, this.closure$positionLeft.v - this.closure$paddleHalfHeight, this.closure$paddleWidth, this.closure$paddleHeight);
-    this.closure$c.fill();
-    this.closure$c.beginPath();
-    this.closure$c.rect(this.closure$width - this.closure$paddleOffset - this.closure$paddleWidth, this.closure$positionRight.v - this.closure$paddleHalfHeight, this.closure$paddleWidth, this.closure$paddleHeight);
-    this.closure$c.fill();
-    this.closure$c.beginPath();
-    this.closure$c.rect(this.closure$ballPosition.v.x - this.closure$ballRadius, this.closure$ballPosition.v.y - this.closure$ballRadius, this.closure$ballRadius * 2, this.closure$ballRadius * 2);
-    this.closure$c.fill();
-  };
-  main$ObjectLiteral.prototype.sign_0 = function (v) {
-    return v > 0 ? 1.0 : v < 0 ? -1.0 : 0.0;
-  };
-  main$ObjectLiteral.prototype.calculateSpeed_0 = function (currentSpeed, direction, dt, max) {
-    if (max === void 0)
-      max = this.closure$maxSpeed;
-    var speed = currentSpeed;
-    var d = 4000.0 * dt;
-    if (this.sign_0(direction) !== this.sign_0(speed))
-      speed *= 0.9;
-    speed += d * direction;
-    speed = clamp(speed, -max, max);
-    return speed;
-  };
-  main$ObjectLiteral.prototype.boundPlayers_0 = function (position, speed) {
-    if (position - this.closure$paddleHalfHeight < 0)
-      return new Pair(this.closure$paddleHalfHeight, 0.0);
-    if (position + this.closure$paddleHalfHeight > this.closure$height)
-      return new Pair(this.closure$height - this.closure$paddleHalfHeight, 0.0);
-    return new Pair(position, speed);
-  };
-  function main$ObjectLiteral$update$verticalDirection(d) {
-    return -d * 0.08;
-  }
-  main$ObjectLiteral.prototype.update_14dthe$ = function (dt) {
-    var directionLeft = 0.0;
-    if (this.closure$downPressed.v)
-      directionLeft += 1;
-    if (this.closure$upPressed.v)
-      directionLeft -= 1;
-    this.closure$speedLeft.v = this.calculateSpeed_0(this.closure$speedLeft.v, directionLeft, dt);
-    this.closure$positionLeft.v += this.closure$speedLeft.v * dt;
-    this.closure$speedRight.v = this.calculateSpeed_0(this.closure$speedRight.v, this.sign_0(this.closure$ballPosition.v.y - this.closure$positionRight.v), dt, this.closure$maxSpeed / 2);
-    this.closure$positionRight.v += this.closure$speedRight.v * dt;
-    var tmp$ = this.boundPlayers_0(this.closure$positionLeft.v, this.closure$speedLeft.v);
-    var position1 = tmp$.component1()
-    , speed1 = tmp$.component2();
-    this.closure$positionLeft.v = position1;
-    this.closure$speedLeft.v = speed1;
-    var tmp$_0 = this.boundPlayers_0(this.closure$positionRight.v, this.closure$speedRight.v);
-    var position2 = tmp$_0.component1()
-    , speed2 = tmp$_0.component2();
-    this.closure$positionRight.v = position2;
-    this.closure$speedRight.v = speed2;
-    this.closure$ballPosition.v = this.closure$ballPosition.v.plus_qu6wix$(this.closure$ballDirection.v.times_14dthe$(this.closure$ballSpeed.v).times_14dthe$(dt));
-    var offset = 100.0;
-    if (this.closure$ballPosition.v.x < -offset) {
-      this.closure$scoreRight.v = this.closure$scoreRight.v + 1 | 0;
-      this.closure$ballPosition.v = new Vector2(this.closure$width / 2, this.closure$height / 2);
-      this.closure$ballDirection.v = Vector2$Companion_getInstance().left;
-      this.closure$ballSpeed.v = this.closure$ballInitialSpeed;
-    }
-    if (this.closure$ballPosition.v.x > this.closure$width + offset) {
-      this.closure$scoreLeft.v = this.closure$scoreLeft.v + 1 | 0;
-      this.closure$ballPosition.v = new Vector2(this.closure$width / 2, this.closure$height / 2);
-      this.closure$ballDirection.v = Vector2$Companion_getInstance().right;
-      this.closure$ballSpeed.v = this.closure$ballInitialSpeed;
-    }
-    var verticalDirection = main$ObjectLiteral$update$verticalDirection;
-    if (this.closure$ballPosition.v.x - this.closure$ballRadius < this.closure$paddleOffset + this.closure$paddleWidth && this.closure$ballPosition.v.x + this.closure$ballRadius > this.closure$paddleOffset && this.closure$ballPosition.v.y > this.closure$positionLeft.v - this.closure$paddleHalfHeight - this.closure$ballRadius && this.closure$ballPosition.v.y < this.closure$positionLeft.v + this.closure$paddleHalfHeight + this.closure$ballRadius && this.closure$leftTurn.v) {
-      this.closure$ballDirection.v = (new Vector2(1.0, verticalDirection(this.closure$positionLeft.v - this.closure$ballPosition.v.y))).normalized;
-      this.closure$ballSpeed.v *= this.closure$speedUpFactor;
-      this.closure$leftTurn.v = !this.closure$leftTurn.v;
-    }
-    if (this.closure$ballPosition.v.x + this.closure$ballRadius > this.closure$width - (this.closure$paddleOffset + this.closure$paddleWidth) && this.closure$ballPosition.v.x - this.closure$ballRadius < this.closure$width - this.closure$paddleOffset && this.closure$ballPosition.v.y > this.closure$positionRight.v - this.closure$paddleHalfHeight - this.closure$ballRadius && this.closure$ballPosition.v.y < this.closure$positionRight.v + this.closure$paddleHalfHeight + this.closure$ballRadius && !this.closure$leftTurn.v) {
-      this.closure$ballDirection.v = (new Vector2(-1.0, verticalDirection(this.closure$positionRight.v - this.closure$ballPosition.v.y))).normalized;
-      this.closure$ballSpeed.v *= this.closure$speedUpFactor;
-      this.closure$leftTurn.v = !this.closure$leftTurn.v;
-    }
-    if (this.closure$ballPosition.v.y - this.closure$ballRadius < 0) {
-      this.closure$ballDirection.v = new Vector2(this.closure$ballDirection.v.x, -this.closure$ballDirection.v.y);
-      this.closure$ballPosition.v = new Vector2(this.closure$ballPosition.v.x, -this.closure$ballPosition.v.y + this.closure$ballRadius);
-    }
-    if (this.closure$ballPosition.v.y + this.closure$ballRadius > this.closure$height) {
-      this.closure$ballDirection.v = new Vector2(this.closure$ballDirection.v.x, -this.closure$ballDirection.v.y);
-      this.closure$ballPosition.v = new Vector2(this.closure$ballPosition.v.x, this.closure$height - (this.closure$ballPosition.v.y - this.closure$height) - this.closure$ballRadius);
-    }
-  };
-  main$ObjectLiteral.$metadata$ = {
+  KeyboardController.$metadata$ = {
     kind: Kotlin.Kind.CLASS,
-    interfaces: [GameLoop]
+    simpleName: 'KeyboardController',
+    interfaces: [Controller]
   };
-  function main$lambda(closure$updateSize) {
-    return function (it) {
-      closure$updateSize();
-    };
-  }
-  function main$lambda_0(closure$downPressed, closure$upPressed) {
-    return function (it) {
-      var tmp$, tmp$_0;
-      Kotlin.isType(tmp$ = it, KeyboardEvent) ? tmp$ : Kotlin.throwCCE();
-      tmp$_0 = it.key;
-      if (Kotlin.equals(tmp$_0, 'ArrowDown'))
-        closure$downPressed.v = true;
-      else if (Kotlin.equals(tmp$_0, 'ArrowUp'))
-        closure$upPressed.v = true;
-    };
-  }
-  function main$lambda_1(closure$downPressed, closure$upPressed) {
-    return function (it) {
-      var tmp$, tmp$_0;
-      Kotlin.isType(tmp$ = it, KeyboardEvent) ? tmp$ : Kotlin.throwCCE();
-      tmp$_0 = it.key;
-      if (Kotlin.equals(tmp$_0, 'ArrowDown'))
-        closure$downPressed.v = false;
-      else if (Kotlin.equals(tmp$_0, 'ArrowUp'))
-        closure$upPressed.v = false;
-    };
-  }
   function main(args) {
-    var tmp$, tmp$_0;
+    var tmp$;
     var canvas = Kotlin.isType(tmp$ = document.getElementById('canvas'), HTMLCanvasElement) ? tmp$ : Kotlin.throwCCE();
-    var c = Kotlin.isType(tmp$_0 = canvas.getContext('2d'), CanvasRenderingContext2D) ? tmp$_0 : Kotlin.throwCCE();
-    var width = 800.0;
-    var height = 600.0;
-    var paddleOffset = 20.0;
-    var paddleHeight = 60.0;
-    var paddleHalfHeight = paddleHeight / 2;
-    var paddleWidth = 12.0;
-    var maxSpeed = 1000.0;
-    var scoreLeft = {v: 0};
-    var scoreRight = {v: 0};
-    var positionLeft = {v: height / 2};
-    var positionRight = {v: height / 2};
-    var speedLeft = {v: 0.0};
-    var speedRight = {v: 0.0};
-    var downPressed = {v: false};
-    var upPressed = {v: false};
-    var ballRadius = 7.5;
-    var ballPosition = {v: new Vector2(width / 2, height / 2)};
-    var ballDirection = {v: Vector2$Companion_getInstance().left};
-    var ballInitialSpeed = 400.0;
-    var ballSpeed = {v: ballInitialSpeed};
-    var speedUpFactor = 1.05;
-    var leftTurn = {v: true};
-    var updateSize = main$updateSize(canvas, width, height, c);
-    var game = new main$ObjectLiteral(c, canvas, width, height, scoreLeft, scoreRight, paddleOffset, positionLeft, paddleHalfHeight, paddleWidth, paddleHeight, positionRight, ballPosition, ballRadius, maxSpeed, downPressed, upPressed, speedLeft, speedRight, ballDirection, ballSpeed, ballInitialSpeed, leftTurn, speedUpFactor);
-    updateSize();
-    window.addEventListener('resize', main$lambda(updateSize));
-    window.addEventListener('keydown', main$lambda_0(downPressed, upPressed));
-    window.addEventListener('keyup', main$lambda_1(downPressed, upPressed));
+    var game = new Pong(canvas);
+    game.leftController = new KeyboardController(game, game.left);
+    game.rightController = new AIController(game, game.right);
     game.start();
   }
+  function Player(position, score, paddleHeight, paddleWidth) {
+    if (score === void 0)
+      score = 0;
+    if (paddleHeight === void 0)
+      paddleHeight = 60.0;
+    if (paddleWidth === void 0)
+      paddleWidth = 10.0;
+    this.position = position;
+    this.score = score;
+    this.paddleHeight = paddleHeight;
+    this.paddleWidth = paddleWidth;
+    this.halfHeight_0 = this.paddleHeight / 2;
+    this.halfWidth_0 = this.paddleWidth / 2;
+  }
+  Object.defineProperty(Player.prototype, 'paddleBounds', {
+    get: function () {
+      return Rectangle2_init(this.position.plus_hdskun$(new Vector2(-this.halfWidth_0, -this.halfHeight_0)), this.paddleWidth, this.paddleHeight);
+    }
+  });
+  Player.$metadata$ = {
+    kind: Kotlin.Kind.CLASS,
+    simpleName: 'Player',
+    interfaces: []
+  };
+  function Pong(canvas, width, height) {
+    if (width === void 0)
+      width = 800.0;
+    if (height === void 0)
+      height = 600.0;
+    GameLoop.call(this);
+    this.canvas = canvas;
+    this.width = width;
+    this.height = height;
+    var tmp$;
+    this.c_0 = Kotlin.isType(tmp$ = this.canvas.getContext('2d'), CanvasRenderingContext2D) ? tmp$ : Kotlin.throwCCE();
+    this.middle_0 = (new Vector2(this.width, this.height)).div_14dthe$(2.0);
+    this.leftTurn_0 = true;
+    this.playerOffset = 20.0;
+    this.maxPlayerSpeed = 600.0;
+    this.left = new Player(new Vector2(this.playerOffset, this.height / 2.0));
+    this.right = new Player(new Vector2(this.width - this.playerOffset, this.height / 2.0));
+    this.ball = new Ball(Vector2$Companion_getInstance().zero);
+    this.leftController = new EmptyController(this, this.left);
+    this.rightController = new EmptyController(this, this.right);
+    this.updateSize();
+    window.addEventListener('resize', Pong_init$lambda(this));
+  }
+  Pong.prototype.randomVector_0 = function () {
+    return new Vector2(Math.random() - 0.5, Math.random() - 0.5);
+  };
+  Pong.prototype.resetPosition_0 = function ($receiver) {
+    this.ball.position = this.middle_0.plus_hdskun$(this.randomVector_0());
+  };
+  Pong.prototype.contain_0 = function (player) {
+    if (player.paddleBounds.top < 0)
+      player.position = new Vector2(player.position.x, player.paddleHeight / 2.0);
+    if (player.paddleBounds.bottom > this.height)
+      player.position = new Vector2(player.position.x, this.height - player.paddleHeight / 2.0);
+  };
+  function Pong$update$verticalDirection(d) {
+    return -d * 0.05;
+  }
+  Pong.prototype.update_14dthe$ = function (dt) {
+    var tmp$, tmp$_0, tmp$_1, tmp$_2;
+    this.ball.update_14dthe$(dt);
+    if (this.ball.position.y - this.ball.radius < 0) {
+      this.ball.direction = new Vector2(this.ball.direction.x, -this.ball.direction.y);
+      this.ball.position = new Vector2(this.ball.position.x, -this.ball.position.y + this.ball.radius + 1.0);
+    }
+    if (this.ball.position.y + this.ball.radius > this.height) {
+      this.ball.direction = new Vector2(this.ball.direction.x, -this.ball.direction.y);
+      this.ball.position = new Vector2(this.ball.position.x, this.height - (this.ball.position.y - this.height) - this.ball.radius - 1.0);
+    }
+    tmp$ = this.left;
+    tmp$.position = tmp$.position.plus_hdskun$(Vector2$Companion_getInstance().up.times_14dthe$(this.leftController.direction).times_14dthe$(this.maxPlayerSpeed).times_14dthe$(dt));
+    tmp$_0 = this.right;
+    tmp$_0.position = tmp$_0.position.plus_hdskun$(Vector2$Companion_getInstance().up.times_14dthe$(this.rightController.direction).times_14dthe$(this.maxPlayerSpeed).times_14dthe$(dt));
+    this.contain_0(this.left);
+    this.contain_0(this.right);
+    var offset = 100.0;
+    if (this.ball.position.x < -offset) {
+      tmp$_1 = this.right;
+      tmp$_1.score = tmp$_1.score + 1 | 0;
+      this.ball.direction = Vector2$Companion_getInstance().left;
+      this.resetPosition_0(this.ball);
+      this.ball.resetSpeed();
+    }
+    if (this.ball.position.x > this.width + offset) {
+      tmp$_2 = this.left;
+      tmp$_2.score = tmp$_2.score + 1 | 0;
+      this.ball.direction = Vector2$Companion_getInstance().right;
+      this.resetPosition_0(this.ball);
+      this.ball.resetSpeed();
+    }
+    var verticalDirection = Pong$update$verticalDirection;
+    if (this.leftTurn_0 && this.left.paddleBounds.intersects_i6z3bx$(this.ball.bounds)) {
+      this.ball.direction = (new Vector2(1.0, verticalDirection(this.left.position.y - this.ball.position.y))).normalized;
+      this.ball.speedUp();
+      this.leftTurn_0 = !this.leftTurn_0;
+    }
+    if (!this.leftTurn_0 && this.ball.bounds.intersects_i6z3bx$(this.right.paddleBounds)) {
+      this.ball.direction = (new Vector2(-1.0, verticalDirection(this.right.position.y - this.ball.position.y))).normalized;
+      this.ball.speedUp();
+      this.leftTurn_0 = !this.leftTurn_0;
+    }
+  };
+  Pong.prototype.draw_48okks$ = function ($receiver) {
+    this.c_0.beginPath();
+    this.c_0.rect($receiver.left, $receiver.top, $receiver.width, $receiver.height);
+    this.c_0.fill();
+  };
+  Pong.prototype.render = function () {
+    this.c_0.save();
+    this.c_0.setTransform(1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+    this.c_0.clearRect(0.0, 0.0, this.canvas.width, this.canvas.height);
+    this.c_0.restore();
+    var middleX = this.width / 2;
+    var x = floor(middleX) + 0.5;
+    this.c_0.lineWidth = 4.0;
+    this.c_0.beginPath();
+    this.c_0.setLineDash([5.0, 10.0]);
+    this.c_0.lineDashOffset = 10.0;
+    this.c_0.moveTo(x, 0.0);
+    this.c_0.lineTo(x, this.height);
+    this.c_0.stroke();
+    this.c_0.strokeStyle = 'white';
+    this.c_0.lineWidth = 5.0;
+    this.c_0.setLineDash([]);
+    this.c_0.beginPath();
+    this.c_0.moveTo(0.0, -2.5);
+    this.c_0.lineTo(this.width, -2.5);
+    this.c_0.stroke();
+    this.c_0.beginPath();
+    this.c_0.moveTo(0.0, this.height + 2.5);
+    this.c_0.lineTo(this.width, this.height + 2.5);
+    this.c_0.stroke();
+    this.c_0.fillStyle = 'white';
+    this.c_0.font = '80px Square';
+    this.c_0.textAlign = 'right';
+    this.c_0.textBaseline = 'top';
+    this.c_0.fillText(this.left.score.toString(), middleX - 40.0, 20.0 - 7.0);
+    this.c_0.textAlign = 'left';
+    this.c_0.fillText(this.right.score.toString(), middleX + 40.0 - 0.5, 20.0 - 7.0);
+    this.c_0.fillStyle = 'white';
+    this.draw_48okks$(this.left.paddleBounds);
+    this.draw_48okks$(this.right.paddleBounds);
+    this.draw_48okks$(this.ball.bounds);
+  };
+  Pong.prototype.updateSize = function () {
+    var dpi = window.devicePixelRatio;
+    this.canvas.width = floor(this.canvas.clientWidth * dpi);
+    this.canvas.height = floor(this.canvas.clientHeight * dpi);
+    var scaleX = this.canvas.width / this.width;
+    var scaleY = this.canvas.height / this.height;
+    if (scaleX < scaleY)
+      this.c_0.setTransform(scaleX, 0.0, 0.0, scaleX, 0.0, floor((this.canvas.height - this.height * scaleX) / 2));
+    else
+      this.c_0.setTransform(scaleY, 0.0, 0.0, scaleY, floor((this.canvas.width - this.width * scaleY) / 2), 0.0);
+  };
+  function Pong_init$lambda(this$Pong) {
+    return function (it) {
+      this$Pong.updateSize();
+    };
+  }
+  Pong.$metadata$ = {
+    kind: Kotlin.Kind.CLASS,
+    simpleName: 'Pong',
+    interfaces: [GameLoop]
+  };
   function toRadians($receiver) {
     return $receiver * Math.PI / 180;
   }
@@ -291,6 +363,9 @@ var Pong = function (_, Kotlin) {
   function modulo_0($receiver, m) {
     return ($receiver % m + m) % m;
   }
+  function sign($receiver) {
+    return $receiver > 0 ? 1.0 : $receiver < 0 ? -1.0 : 0.0;
+  }
   function nextHighestPowerOf2($receiver) {
     var v = $receiver;
     v = v - 1 | 0;
@@ -302,6 +377,79 @@ var Pong = function (_, Kotlin) {
     v = v + 1 | 0;
     return v;
   }
+  function Rectangle2(position, dimensions) {
+    this.position = position;
+    this.dimensions = dimensions;
+  }
+  Object.defineProperty(Rectangle2.prototype, 'left', {
+    get: function () {
+      return this.position.x;
+    }
+  });
+  Object.defineProperty(Rectangle2.prototype, 'top', {
+    get: function () {
+      return this.position.y;
+    }
+  });
+  Object.defineProperty(Rectangle2.prototype, 'right', {
+    get: function () {
+      return this.left + this.width;
+    }
+  });
+  Object.defineProperty(Rectangle2.prototype, 'bottom', {
+    get: function () {
+      return this.top + this.height;
+    }
+  });
+  Object.defineProperty(Rectangle2.prototype, 'width', {
+    get: function () {
+      return this.dimensions.x;
+    }
+  });
+  Object.defineProperty(Rectangle2.prototype, 'height', {
+    get: function () {
+      return this.dimensions.y;
+    }
+  });
+  Rectangle2.prototype.intersects_i6z3bx$ = function (r) {
+    return this.left < r.right && this.right > r.left && this.top < r.bottom && this.bottom > r.top;
+  };
+  Rectangle2.$metadata$ = {
+    kind: Kotlin.Kind.CLASS,
+    simpleName: 'Rectangle2',
+    interfaces: []
+  };
+  function Rectangle2_init(position, width, height, $this) {
+    $this = $this || Object.create(Rectangle2.prototype);
+    Rectangle2.call($this, position, new Vector2(width, height));
+    return $this;
+  }
+  function Rectangle2_init_0(x, y, width, height, $this) {
+    $this = $this || Object.create(Rectangle2.prototype);
+    Rectangle2.call($this, new Vector2(x, y), new Vector2(width, height));
+    return $this;
+  }
+  Rectangle2.prototype.component1 = function () {
+    return this.position;
+  };
+  Rectangle2.prototype.component2 = function () {
+    return this.dimensions;
+  };
+  Rectangle2.prototype.copy_7y3lma$ = function (position, dimensions) {
+    return new Rectangle2(position === void 0 ? this.position : position, dimensions === void 0 ? this.dimensions : dimensions);
+  };
+  Rectangle2.prototype.toString = function () {
+    return 'Rectangle2(position=' + Kotlin.toString(this.position) + (', dimensions=' + Kotlin.toString(this.dimensions)) + ')';
+  };
+  Rectangle2.prototype.hashCode = function () {
+    var result = 0;
+    result = result * 31 + Kotlin.hashCode(this.position) | 0;
+    result = result * 31 + Kotlin.hashCode(this.dimensions) | 0;
+    return result;
+  };
+  Rectangle2.prototype.equals = function (other) {
+    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.position, other.position) && Kotlin.equals(this.dimensions, other.dimensions)))));
+  };
   function Vector2(x, y) {
     Vector2$Companion_getInstance();
     if (x === void 0)
@@ -354,13 +502,13 @@ var Pong = function (_, Kotlin) {
       return angle;
     }
   });
-  Vector2.prototype.plus_qu6wix$ = function (v) {
+  Vector2.prototype.plus_hdskun$ = function (v) {
     return new Vector2(this.x + v.x, this.y + v.y);
   };
   Vector2.prototype.unaryMinus = function () {
     return new Vector2(-this.x, -this.y);
   };
-  Vector2.prototype.minus_qu6wix$ = function (v) {
+  Vector2.prototype.minus_hdskun$ = function (v) {
     return new Vector2(this.x - v.x, this.y - v.y);
   };
   Vector2.prototype.times_14dthe$ = function (s) {
@@ -398,20 +546,32 @@ var Pong = function (_, Kotlin) {
   var package$pl = _.pl || (_.pl = {});
   var package$dzduniak = package$pl.dzduniak || (package$pl.dzduniak = {});
   var package$pong = package$dzduniak.pong || (package$dzduniak.pong = {});
+  package$pong.AIController = AIController;
+  package$pong.Ball = Ball;
+  package$pong.Controller = Controller;
+  package$pong.EmptyController = EmptyController;
   package$pong.GameLoop = GameLoop;
+  package$pong.KeyboardController = KeyboardController;
   package$pong.main_kand9s$ = main;
-  package$pong.toRadians_yrwdxr$ = toRadians;
-  package$pong.toDegrees_yrwdxr$ = toDegrees;
-  package$pong.clamp_nig4hr$ = clamp;
-  package$pong.floor_yrwdxr$ = floor;
-  package$pong.round_yrwdxr$ = round;
-  package$pong.modulo_dqglrj$ = modulo;
-  package$pong.modulo_38ydlf$ = modulo_0;
-  package$pong.nextHighestPowerOf2_s8ev3n$ = nextHighestPowerOf2;
+  package$pong.Player = Player;
+  package$pong.Pong = Pong;
+  var package$math = package$pong.math || (package$pong.math = {});
+  package$math.toRadians_yrwdxr$ = toRadians;
+  package$math.toDegrees_yrwdxr$ = toDegrees;
+  package$math.clamp_nig4hr$ = clamp;
+  package$math.floor_yrwdxr$ = floor;
+  package$math.round_yrwdxr$ = round;
+  package$math.modulo_dqglrj$ = modulo;
+  package$math.modulo_38ydlf$ = modulo_0;
+  package$math.sign_yrwdxr$ = sign;
+  package$math.nextHighestPowerOf2_s8ev3n$ = nextHighestPowerOf2;
+  package$math.Rectangle2_init_35p5fx$ = Rectangle2_init;
+  package$math.Rectangle2_init_6y0v78$ = Rectangle2_init_0;
+  package$math.Rectangle2 = Rectangle2;
   Object.defineProperty(Vector2, 'Companion', {
     get: Vector2$Companion_getInstance
   });
-  package$pong.Vector2 = Vector2;
+  package$math.Vector2 = Vector2;
   main([]);
   Kotlin.defineModule('Pong', _);
   return _;
