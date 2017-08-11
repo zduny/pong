@@ -26,7 +26,7 @@ class Pong(val canvas: HTMLCanvasElement, val width: Double = 800.0, val height:
     private fun randomVector() = Vector2(Math.random() - .5, Math.random() - .5)
 
     private fun Ball.resetPosition() {
-        ball.position = middle + randomVector()
+        this.position = middle + randomVector()
     }
 
     private fun contain(player: Player) {
