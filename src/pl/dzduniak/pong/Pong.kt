@@ -20,8 +20,8 @@ class Pong(val canvas: HTMLCanvasElement, val width: Double = 800.0, val height:
     val right = Player(Vector2(width - playerOffset, height / 2.0))
     val ball = Ball(Vector2.zero)
 
-    var leftController: Controller = EmptyController(this, left)
-    var rightController: Controller = EmptyController(this, right)
+    var leftController: Controller = EmptyController()
+    var rightController: Controller = EmptyController()
 
     private fun randomVector() = Vector2(Math.random() - .5, Math.random() - .5)
 

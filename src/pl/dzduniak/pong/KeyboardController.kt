@@ -3,7 +3,7 @@ package pl.dzduniak.pong
 import org.w3c.dom.events.KeyboardEvent
 import kotlin.browser.window
 
-class KeyboardController(game: Pong, player: Player) : Controller(game, player) {
+class KeyboardController() : Controller() {
     private var downPressed = false
     private var upPressed = false
 

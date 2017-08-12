@@ -1,6 +1,6 @@
 package pl.dzduniak.pong
 
-class EmptyController(game: Pong, player: Player) : Controller(game, player) {
+class EmptyController() : Controller() {
     override val direction: Double
         get() = 0.0
 }

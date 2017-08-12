@@ -12,7 +12,9 @@ var Pong = function (_, Kotlin) {
   Pong.prototype = Object.create(GameLoop.prototype);
   Pong.prototype.constructor = Pong;
   function AIController(game, player) {
-    Controller.call(this, game, player);
+    Controller.call(this);
+    this.game = game;
+    this.player = player;
   }
   Object.defineProperty(AIController.prototype, 'direction', {
     get: function () {
@@ -61,17 +63,15 @@ var Pong = function (_, Kotlin) {
     simpleName: 'Ball',
     interfaces: []
   };
-  function Controller(game, player) {
-    this.game = game;
-    this.player = player;
+  function Controller() {
   }
   Controller.$metadata$ = {
     kind: Kotlin.Kind.CLASS,
     simpleName: 'Controller',
     interfaces: []
   };
-  function EmptyController(game, player) {
-    Controller.call(this, game, player);
+  function EmptyController() {
+    Controller.call(this);
   }
   Object.defineProperty(EmptyController.prototype, 'direction', {
     get: function () {
@@ -121,8 +121,8 @@ var Pong = function (_, Kotlin) {
     simpleName: 'GameLoop',
     interfaces: []
   };
-  function KeyboardController(game, player) {
-    Controller.call(this, game, player);
+  function KeyboardController() {
+    Controller.call(this);
     this.downPressed_0 = false;
     this.upPressed_0 = false;
     window.addEventListener('keydown', KeyboardController_init$lambda(this));
@@ -169,7 +169,7 @@ var Pong = function (_, Kotlin) {
     var tmp$;
     var canvas = Kotlin.isType(tmp$ = document.getElementById('canvas'), HTMLCanvasElement) ? tmp$ : Kotlin.throwCCE();
     var game = new Pong(canvas);
-    game.leftController = new KeyboardController(game, game.left);
+    game.leftController = new KeyboardController();
     game.rightController = new AIController(game, game.right);
     game.start();
   }
@@ -215,8 +215,8 @@ var Pong = function (_, Kotlin) {
     this.left = new Player(new Vector2(this.playerOffset, this.height / 2.0));
     this.right = new Player(new Vector2(this.width - this.playerOffset, this.height / 2.0));
     this.ball = new Ball(Vector2$Companion_getInstance().zero);
-    this.leftController = new EmptyController(this, this.left);
-    this.rightController = new EmptyController(this, this.right);
+    this.leftController = new EmptyController();
+    this.rightController = new EmptyController();
     this.updateSize();
     this.resetPosition_0(this.ball);
     window.addEventListener('resize', Pong_init$lambda(this));
@@ -225,7 +225,7 @@ var Pong = function (_, Kotlin) {
     return new Vector2(Math.random() - 0.5, Math.random() - 0.5);
   };
   Pong.prototype.resetPosition_0 = function ($receiver) {
-    this.ball.position = this.middle_0.plus_hdskun$(this.randomVector_0());
+    $receiver.position = this.middle_0.plus_hdskun$(this.randomVector_0());
   };
   Pong.prototype.contain_0 = function (player) {
     if (player.paddleBounds.top < 0)
